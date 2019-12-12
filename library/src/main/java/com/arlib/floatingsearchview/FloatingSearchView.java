@@ -31,6 +31,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -45,6 +46,7 @@ import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -114,6 +116,11 @@ public class FloatingSearchView extends FrameLayout {
     public final static int LEFT_ACTION_MODE_SHOW_HOME = 3;
     public final static int LEFT_ACTION_MODE_NO_LEFT_ACTION = 4;
     private final static int LEFT_ACTION_MODE_NOT_SET = -1;
+
+    private final static int BACKGROUND_IMAGE_GRAVITY_START = 1;
+    private final static int BACKGROUND_IMAGE_GRAVITY_END = 2;
+    private Drawable mSearchInputBackgroundImage;
+    private int mSearchInputBackgroundImageGravity = BACKGROUND_IMAGE_GRAVITY_END;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LEFT_ACTION_MODE_SHOW_HAMBURGER, LEFT_ACTION_MODE_SHOW_SEARCH,
@@ -542,6 +549,9 @@ public class FloatingSearchView extends FrameLayout {
                     , Util.getColor(getContext(), R.color.hint_color)));
             setSuggestionRightIconColor(a.getColor(R.styleable.FloatingSearchView_floatingSearch_suggestionRightIconColor
                     , Util.getColor(getContext(), R.color.gray_active_icon)));
+            setSearchInputBackgroundImage(a.getDrawable(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImage));
+            setSearchInputBackgroundImageGravity(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageGravity,
+                    BACKGROUND_IMAGE_GRAVITY_END));
         } finally {
             a.recycle();
         }
@@ -680,9 +690,9 @@ public class FloatingSearchView extends FrameLayout {
                 } else {
                     switch (mLeftActionMode) {
                         case LEFT_ACTION_MODE_SHOW_HAMBURGER:
-                            if(mLeftMenuClickListener != null){
+                            if (mLeftMenuClickListener != null) {
                                 mLeftMenuClickListener.onClick(mLeftAction);
-                            }else {
+                            } else {
                                 toggleLeftMenu();
                             }
                             break;
@@ -779,7 +789,7 @@ public class FloatingSearchView extends FrameLayout {
      *
      * @return
      */
-    public List<MenuItemImpl> getCurrentMenuItems(){
+    public List<MenuItemImpl> getCurrentMenuItems() {
         return mMenuView.getCurrentMenuItems();
     }
 
@@ -913,6 +923,19 @@ public class FloatingSearchView extends FrameLayout {
         if (mSuggestionsAdapter != null) {
             mSuggestionsAdapter.setRightIconColor(this.mSuggestionRightIconColor);
         }
+    }
+
+    public void setSearchInputBackgroundImage(Drawable drawable) {
+        this.mSearchInputBackgroundImage = drawable;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mSearchInput.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
+        } else {
+            mSearchInput.setCompoundDrawables(null, null, drawable, null);
+        }
+    }
+
+    public void setSearchInputBackgroundImageGravity(int gravity) {
+        this.mSearchInputBackgroundImageGravity = gravity;
     }
 
     /**

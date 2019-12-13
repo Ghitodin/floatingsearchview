@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.Ghitodin'
 
 android {
     compileSdkVersion 29
@@ -6,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 29
-        versionCode 14
-        versionName "2.2.1"
+        versionCode 15
+        versionName "2.2.2"
         //consumerProguardFiles 'consumer-proguard-rules.txt'
     }
 }

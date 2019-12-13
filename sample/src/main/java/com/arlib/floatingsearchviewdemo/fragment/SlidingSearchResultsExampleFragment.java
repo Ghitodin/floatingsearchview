@@ -153,7 +153,7 @@ public class SlidingSearchResultsExampleFragment extends BaseExampleFragment {
             public void onFocusCleared() {
 
                 //set the title of the bar so that when focus is returned a new query begins
-                mSearchView.setSearchBarTitle(mLastQuery);
+                //mSearchView.setSearchBarTitle(mLastQuery);
 
                 //you can also set setSearchText(...) to make keep the query there when not focused and when focus returns
                 //mSearchView.setSearchText(searchSuggestion.getBody());

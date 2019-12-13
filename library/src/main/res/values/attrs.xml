@@ -45,5 +45,12 @@
             <!-- Push object to the right of its container, not changing its size. -->
             <flag name="end" value="0x02" />
         </attr>
+        <attr name="floatingSearch_searchInputBackgroundImageVisibility">
+            <!-- Push object to the left of its container, not changing its size. -->
+            <flag name="always" value="0x01" />
+            <!-- Push object to the right of its container, not changing its size. -->
+            <flag name="notInFocus" value="0x02" />
+            <flag name="noText" value="0x03" />
+        </attr>
     </declare-styleable>
 </resources>

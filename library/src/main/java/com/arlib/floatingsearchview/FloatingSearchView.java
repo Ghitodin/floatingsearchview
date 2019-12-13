@@ -31,6 +31,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -45,6 +46,7 @@ import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -114,6 +116,15 @@ public class FloatingSearchView extends FrameLayout {
     public final static int LEFT_ACTION_MODE_SHOW_HOME = 3;
     public final static int LEFT_ACTION_MODE_NO_LEFT_ACTION = 4;
     private final static int LEFT_ACTION_MODE_NOT_SET = -1;
+
+    private final static int BACKGROUND_IMAGE_GRAVITY_START = 1;
+    private final static int BACKGROUND_IMAGE_GRAVITY_END = 2;
+    private final static int BACKGROUND_IMAGE_VISIBILITY_ALWAYS = 1;
+    private final static int BACKGROUND_IMAGE_VISIBILITY_NOT_IN_FOCUS = 2;
+    private final static int BACKGROUND_IMAGE_VISIBILITY_NO_TEXT = 3;
+    private Drawable mSearchInputBackgroundImage;
+    private int mSearchInputBackgroundImageGravity = BACKGROUND_IMAGE_GRAVITY_END;
+    private int mSearchInputBackgroundImageVisibility = BACKGROUND_IMAGE_VISIBILITY_ALWAYS;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LEFT_ACTION_MODE_SHOW_HAMBURGER, LEFT_ACTION_MODE_SHOW_SEARCH,
@@ -542,6 +553,11 @@ public class FloatingSearchView extends FrameLayout {
                     , Util.getColor(getContext(), R.color.hint_color)));
             setSuggestionRightIconColor(a.getColor(R.styleable.FloatingSearchView_floatingSearch_suggestionRightIconColor
                     , Util.getColor(getContext(), R.color.gray_active_icon)));
+            setSearchInputBackgroundImageGravity(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageGravity,
+                    BACKGROUND_IMAGE_GRAVITY_END));
+            setSearchInputBackgroundImage(a.getDrawable(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImage));
+            setSearchInputBackgroundImageVisibility(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageVisibility,
+                    BACKGROUND_IMAGE_VISIBILITY_ALWAYS));
         } finally {
             a.recycle();
         }
@@ -629,6 +645,14 @@ public class FloatingSearchView extends FrameLayout {
                 }
 
                 mOldQuery = mSearchInput.getText().toString();
+
+                if (mSearchInputBackgroundImageVisibility == BACKGROUND_IMAGE_VISIBILITY_NO_TEXT) {
+                    if (s.length() > 0) {
+                        hideBackgroundImage();
+                    } else {
+                        showBackgroundImage();
+                    }
+                }
             }
 
         });
@@ -641,6 +665,14 @@ public class FloatingSearchView extends FrameLayout {
                     mSkipQueryFocusChangeEvent = false;
                 } else if (hasFocus != mIsFocused) {
                     setSearchFocusedInternal(hasFocus);
+                }
+
+                if (mSearchInputBackgroundImageVisibility == BACKGROUND_IMAGE_VISIBILITY_NOT_IN_FOCUS) {
+                    if (hasFocus) {
+                        hideBackgroundImage();
+                    } else {
+                        showBackgroundImage();
+                    }
                 }
             }
         });
@@ -680,9 +712,9 @@ public class FloatingSearchView extends FrameLayout {
                 } else {
                     switch (mLeftActionMode) {
                         case LEFT_ACTION_MODE_SHOW_HAMBURGER:
-                            if(mLeftMenuClickListener != null){
+                            if (mLeftMenuClickListener != null) {
                                 mLeftMenuClickListener.onClick(mLeftAction);
-                            }else {
+                            } else {
                                 toggleLeftMenu();
                             }
                             break;
@@ -716,14 +748,14 @@ public class FloatingSearchView extends FrameLayout {
             } else {
                 paddingRight += Util.dpToPx(14);
             }
-            mSearchInput.setPadding(0, 0, paddingRight, 0);
+            //mSearchInput.setPadding(0, 0, paddingRight, 0); // disabled
         } else {
             mClearButton.setTranslationX(-menuItemsWidth);
             int paddingRight = menuItemsWidth;
             if (mIsFocused) {
                 paddingRight += Util.dpToPx(CLEAR_BTN_WIDTH_DP);
             }
-            mSearchInput.setPadding(0, 0, paddingRight, 0);
+            //mSearchInput.setPadding(0, 0, paddingRight, 0); // disabled
         }
     }
 
@@ -779,7 +811,7 @@ public class FloatingSearchView extends FrameLayout {
      *
      * @return
      */
-    public List<MenuItemImpl> getCurrentMenuItems(){
+    public List<MenuItemImpl> getCurrentMenuItems() {
         return mMenuView.getCurrentMenuItems();
     }
 
@@ -913,6 +945,42 @@ public class FloatingSearchView extends FrameLayout {
         if (mSuggestionsAdapter != null) {
             mSuggestionsAdapter.setRightIconColor(this.mSuggestionRightIconColor);
         }
+    }
+
+    public void setSearchInputBackgroundImage(Drawable drawable) {
+        this.mSearchInputBackgroundImage = drawable;
+        showBackgroundImage();
+    }
+
+    private void showBackgroundImage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mSearchInput.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    mSearchInputBackgroundImageGravity == BACKGROUND_IMAGE_GRAVITY_START ? mSearchInputBackgroundImage : null,
+                    null,
+                    mSearchInputBackgroundImageGravity == BACKGROUND_IMAGE_GRAVITY_END ? mSearchInputBackgroundImage : null,
+                    null
+            );
+        } else {
+            mSearchInput.setCompoundDrawables(
+                    mSearchInputBackgroundImageGravity == BACKGROUND_IMAGE_GRAVITY_START ? mSearchInputBackgroundImage : null,
+                    null,
+                    mSearchInputBackgroundImageGravity == BACKGROUND_IMAGE_GRAVITY_END ? mSearchInputBackgroundImage : null,
+                    null
+            );
+        }
+        mSearchInput.setPadding(Util.dpToPx(14), 0, Util.dpToPx(14), 0);
+    }
+
+    private void hideBackgroundImage() {
+        mSearchInput.setCompoundDrawables(null, null, null, null);
+    }
+
+    public void setSearchInputBackgroundImageGravity(int gravity) {
+        this.mSearchInputBackgroundImageGravity = gravity;
+    }
+
+    public void setSearchInputBackgroundImageVisibility(int visibility) {
+        this.mSearchInputBackgroundImageVisibility = visibility;
     }
 
     /**

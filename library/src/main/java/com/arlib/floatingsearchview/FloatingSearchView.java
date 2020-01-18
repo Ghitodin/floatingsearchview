@@ -555,7 +555,14 @@ public class FloatingSearchView extends FrameLayout {
                     , Util.getColor(getContext(), R.color.gray_active_icon)));
             setSearchInputBackgroundImageGravity(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageGravity,
                     BACKGROUND_IMAGE_GRAVITY_END));
-            setSearchInputBackgroundImage(a.getDrawable(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImage));
+            Drawable backgroundDrawable;
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP){
+                int drawableResId = a.getResourceId(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImage, -1);
+                backgroundDrawable = AppCompatResources.getDrawable(getContext(), drawableResId);
+            } else {
+                backgroundDrawable = a.getDrawable(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImage);
+            }
+            setSearchInputBackgroundImage(backgroundDrawable);
             setSearchInputBackgroundImageVisibility(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageVisibility,
                     BACKGROUND_IMAGE_VISIBILITY_ALWAYS));
         } finally {

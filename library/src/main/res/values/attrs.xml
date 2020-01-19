@@ -30,6 +30,13 @@
         <attr name="floatingSearch_viewTextColor" format="color" />
         <attr name="floatingSearch_viewSearchInputTextColor" format="color" />
         <attr name="floatingSearch_hintTextColor" format="color" />
+        <attr name="floatingSearch_queryTextMarginStart" format="dimension" />
+        <attr name="floatingSearch_queryTextAlignment">
+            <!-- Push query to the left of its container -->
+            <flag name="start" value="0x01" />
+            <!-- Push query to center of the container. -->
+            <flag name="center" value="0x02" />
+        </attr>
         <attr name="floatingSearch_viewSuggestionItemTextColor" format="color" />
         <attr name="floatingSearch_menuItemIconColor" format="color" />
         <attr name="floatingSearch_actionMenuOverflowColor" format="color" />

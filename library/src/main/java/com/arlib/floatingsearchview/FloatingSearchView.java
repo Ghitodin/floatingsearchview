@@ -34,6 +34,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -125,6 +126,14 @@ public class FloatingSearchView extends FrameLayout {
     private Drawable mSearchInputBackgroundImage;
     private int mSearchInputBackgroundImageGravity = BACKGROUND_IMAGE_GRAVITY_END;
     private int mSearchInputBackgroundImageVisibility = BACKGROUND_IMAGE_VISIBILITY_ALWAYS;
+    private final static int DEFAULT_IMAGE_PADDING = 0;
+
+    // Query box margins (dp)
+    private int DEFAULT_QUERY_MARGIN_PADDING = 20;
+    private int mSearchInputQueryMarginStart = DEFAULT_QUERY_MARGIN_PADDING;
+    // Query gravity
+    private final static int QUERY_GRAVITY_START = 1;
+    private final static int QUERY_GRAVITY_CENTER = 2;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LEFT_ACTION_MODE_SHOW_HAMBURGER, LEFT_ACTION_MODE_SHOW_SEARCH,
@@ -555,6 +564,11 @@ public class FloatingSearchView extends FrameLayout {
                     , Util.getColor(getContext(), R.color.gray_active_icon)));
             setSearchInputBackgroundImageGravity(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageGravity,
                     BACKGROUND_IMAGE_GRAVITY_END));
+
+            setQueryMarginStart(a.getDimensionPixelSize(R.styleable.FloatingSearchView_floatingSearch_queryTextMarginStart, DEFAULT_QUERY_MARGIN_PADDING));
+            setQueryTextGravity(a.getInt(R.styleable.FloatingSearchView_floatingSearch_queryTextAlignment,
+                    QUERY_GRAVITY_CENTER));
+
             Drawable backgroundDrawable;
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP){
                 int drawableResId = a.getResourceId(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImage, -1);
@@ -913,6 +927,37 @@ public class FloatingSearchView extends FrameLayout {
     public void setQueryTextSize(int sizePx) {
         mQueryTextSize = sizePx;
         mSearchInput.setTextSize(mQueryTextSize);
+    }
+
+    public void setQueryMarginStart(int sizePx) {
+        mSearchInputQueryMarginStart = sizePx;
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)
+                mSearchInputParent.getLayoutParams();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            params.setMarginStart(mSearchInputQueryMarginStart);
+
+        } else {
+            params.setMargins(mSearchInputQueryMarginStart, 0, 0, 0);
+        }
+        mSearchInputParent.setLayoutParams(params);
+        mSearchInputParent.requestLayout();
+    }
+
+    public void setQueryTextGravity(int alignmentType) {
+        int startOrLeft;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            startOrLeft = RelativeLayout.ALIGN_PARENT_START;
+        } else {
+            startOrLeft = RelativeLayout.ALIGN_PARENT_LEFT;
+        }
+
+        int alignment = alignmentType == QUERY_GRAVITY_START ?
+                startOrLeft : RelativeLayout.CENTER_IN_PARENT;
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)
+                mSearchInputParent.getLayoutParams();
+        params.addRule(alignment, RelativeLayout.TRUE);
+        mSearchInputParent.setLayoutParams(params);
+        mSearchInputParent.requestLayout();
     }
 
     /**

@@ -579,9 +579,15 @@ public class FloatingSearchView extends FrameLayout {
             setSearchInputBackgroundImage(backgroundDrawable);
             setSearchInputBackgroundImageVisibility(a.getInt(R.styleable.FloatingSearchView_floatingSearch_searchInputBackgroundImageVisibility,
                     BACKGROUND_IMAGE_VISIBILITY_ALWAYS));
+            setRoundCorners(a.getDimensionPixelSize(R.styleable.FloatingSearchView_floatingSearch_cornerRadius,
+                    CARD_VIEW_CORNERS_HEIGHT));
         } finally {
             a.recycle();
         }
+    }
+
+    private void setRoundCorners(int radius) {
+        mQuerySection.setRadius(radius);
     }
 
     private void setupQueryBar() {

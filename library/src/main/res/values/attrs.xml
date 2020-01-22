@@ -59,5 +59,6 @@
             <flag name="notInFocus" value="0x02" />
             <flag name="noText" value="0x03" />
         </attr>
+        <attr name="floatingSearch_cornerRadius" format="dimension" />
     </declare-styleable>
 </resources>
